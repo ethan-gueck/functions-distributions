@@ -4,6 +4,12 @@ The Functions & Distributions domain of [Ethan's NN](https://ethan-gueck.github.
 
 Flashcard decks in this track: Probability Distributions. A neuron on the portfolio fills in once a topic here lists its card id in `cards`, and its **See how it works** button opens the topic's page.
 
+## Repo health
+
+`░░░░░░░░░░░░░░░░░░░░` **<0.01% of 1 GB** (39 KB, GitHub's reported repo size on 2026-10-07)
+
+GitHub Pages publishes at most 1 GB per site and GitHub recommends keeping a repository under 1 GB, so this should stay well below 100%.
+
 ## Topics
 
 None yet: every neuron in this track shows its flashcard with **Coming soon**.
@@ -12,7 +18,7 @@ None yet: every neuron in this track shows its flashcard with **Coming soon**.
 
 ```
 functions-distributions/
-├── <topic>/                  one folder per topic (see "Adding a topic")
+├── <topic>/                  one folder per topic
 ├── core/formula.py           every neuron's mathematics, in flashcard order (empty sections until built)
 ├── tests/test_site.py        the site builds; topic cards are flashcard ids
 ├── pyproject.toml            [tool.portfolio-site]: site title and URL
@@ -27,10 +33,3 @@ uv run pytest                             # tests
 uv run python -m general serve --port 8001   # build _site/ and preview it at http://localhost:8001
 uv lock --upgrade-package portfolio-projects # pick up changes to general/
 ```
-
-## Adding a topic
-
-1. **Write the mathematics** in that neuron's section of [`core/formula.py`](core/formula.py), the way it reads, with no input checks, rounding cleanup or formatting. This is the part to learn from; everything else is scaffolding.
-2. **Build the page around it:** a topic folder (its name becomes the page's path, e.g. `https://ethan-gueck.github.io/functions-distributions/<topic>/`) whose `solver.py` imports from `core.formula` and adds what the page needs, with `html/` (template, `<topic>_math.js` mirror, controller, CSS), `style.py`, `api.py` (`cards=("D.6",)`) and `tests/` (including the JS parity test). The [algebra repo](https://github.com/ethan-gueck/algebra) has worked examples.
-   The "View the code" popup shows only the page's functions from `core/formula.py`: pass `code=(CodeFile(FORMULA, "…", only=MATH),)` to `render_page` and put `{{code_button}}` in the template.
-3. Push to `main`. The workflow tests, builds and deploys, and the neuron fills in on the portfolio.
