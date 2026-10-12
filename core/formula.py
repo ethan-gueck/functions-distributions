@@ -1,5 +1,7 @@
 """Functions & Distributions: the mathematics behind every neuron in this track, in flashcard order."""
 
+# ============= Functions =============
+
 # _____________ F.1 Linear _____________
 
 # _____________ F.2 Quadratic _____________
@@ -36,6 +38,44 @@
 
 # _____________ F.18 Floor (Step) Function _____________
 
+# _____________ F.19 Cube Root _____________
+
+# _____________ F.20 Even vs. Odd Powers _____________
+
+# _____________ F.21 Exponential Family _____________
+
+# _____________ F.22 Logarithm Bases _____________
+
+# _____________ F.23 Sinusoid with Phase Shift _____________
+
+# _____________ F.24 Secant _____________
+
+# _____________ F.25 Hyperbolic Sine & Cosine _____________
+
+# _____________ F.26 Softplus _____________
+
+# _____________ F.27 Heaviside Step _____________
+
+# _____________ F.28 Sign Function _____________
+
+# _____________ F.29 Sawtooth (Fractional Part) _____________
+
+# _____________ F.30 Logistic Growth _____________
+
+# _____________ F.31 Power Law _____________
+
+# _____________ F.32 Piecewise Function _____________
+
+# _____________ F.33 Circle _____________
+
+# _____________ F.34 Ellipse _____________
+
+# _____________ F.35 Hyperbola _____________
+
+# _____________ F.36 Polar Rose _____________
+
+# ============= Probability Distributions =============
+
 # _____________ D.1 Bernoulli _____________
 
 # _____________ D.2 Binomial _____________
@@ -48,7 +88,7 @@
 
 # _____________ D.6 Normal _____________
 
-# _____________ D.7 Student’s _____________
+# _____________ D.7 Student’s t (vs. normal) _____________
 
 # _____________ D.8 Exponential _____________
 
@@ -61,3 +101,19 @@
 # _____________ D.12 Log-Normal _____________
 
 # _____________ D.13 Pareto (Power Law) _____________
+
+# _____________ D.14 Negative Binomial _____________
+
+# _____________ D.15 Hypergeometric _____________
+
+# _____________ D.16 Discrete Uniform _____________
+
+# _____________ D.17 Weibull _____________
+
+# _____________ D.18 Laplace (vs. normal) _____________
+
+# _____________ D.19 Cauchy (vs. normal) _____________
+
+# _____________ D.20 F-Distribution _____________
+
+# _____________ D.21 Beta Shapes _____________
