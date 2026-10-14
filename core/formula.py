@@ -1,8 +1,18 @@
 """Functions & Distributions: the mathematics behind every neuron in this track, in flashcard order."""
 
+import math
+
 # ============= Functions =============
 
 # _____________ F.1 Linear _____________
+
+def linear(x, m, b):
+    """y = mx + b: a straight line with slope m and y-intercept b."""
+    return m * x + b
+
+def linear_x_intercept(m, b):
+    """x = −b / m: where the line crosses the x-axis. A flat line (m = 0) never does, unless b = 0."""
+    return -b / m
 
 # _____________ F.2 Quadratic _____________
 
@@ -10,7 +20,38 @@
 
 # _____________ F.4 Absolute Value _____________
 
+def absolute_value(x, a=1, h=0, k=0):
+    """y = a|x − h| + k: the V of y = |x|, stretched by a and moved so its vertex sits at (h, k)."""
+    return a * abs(x - h) + k
+
+def absolute_value_vertex(h=0, k=0):
+    """(h, k): the point of the V, where the graph turns. For y = |x| it is (0, 0)."""
+    return h, k
+
+def absolute_value_x_intercepts(a, h, k):
+    """x = h ± (−k / a): where the V crosses the x-axis. It only reaches the axis when −k / a ≥ 0."""
+    d = -k / a
+    if d < 0:
+        return ()
+    if d == 0:
+        return (h,)
+    return (h - d, h + d)
+
 # _____________ F.5 Square Root _____________
+
+def square_root(x, a=1, h=0, k=0):
+    """y = a√(x − h) + k: half of a sideways parabola, starting at (h, k). For y = √x it starts at (0, 0)."""
+    return a * math.sqrt(x - h) + k
+
+def square_root_domain(h=0):
+    """x ≥ h: the square root of a negative number is not a real number, so the graph starts at x = h."""
+    return h
+
+def square_root_x_intercept(a, h, k):
+    """x = h + (k / a)²: where the curve crosses the x-axis. It only reaches the axis when −k / a ≥ 0."""
+    if -k / a < 0:
+        return None
+    return h + (k / a) ** 2
 
 # _____________ F.6 Reciprocal _____________
 

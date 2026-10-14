@@ -25,7 +25,7 @@ portfolio-projects = { git = "https://github.com/ethan-gueck/portfolio-projects"
 title = "Functions & Distributions"
 url = "https://ethan-gueck.github.io/functions-distributions/"
 description = "Functions & Distributions formulas as interactive pages. Each page fills a neuron on Ethan's NN."
-decks = ["Probability Distributions"]
+decks = ["Functions", "Probability Distributions"]
 
 [tool.pytest.ini_options]
 norecursedirs = [".*", "_site", "output", "node_modules", "venv"]

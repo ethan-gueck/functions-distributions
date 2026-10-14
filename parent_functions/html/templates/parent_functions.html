@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-theme="{{theme_name}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  {{head}}
+  <style>
+{{styles}}
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="container">
+      <div class="masthead__bar">
+        <span class="masthead__kicker">Functions · F.1 · F.4 · F.5</span>
+        <a href="https://ethan-gueck.github.io/">ethan-gueck.github.io</a>
+      </div>
+      <div class="masthead__title">
+        <div>
+          <h1 class="masthead__name">{{title}}</h1>
+          <p class="masthead__subtitle">Three parent functions, and how a few numbers move, flip and stretch each one.</p>
+        </div>
+        <div class="masthead__aside formulas" aria-label="y equals m x plus b; y equals a times the absolute value of x minus h, plus k; y equals a times the square root of x minus h, plus k">
+          <p class="formula"><span class="var">y</span> = <span class="var">mx</span> + <span class="var">b</span></p>
+          <p class="formula"><span class="var">y</span> = <span class="var">a</span>|<span class="var">x</span> − <span class="var">h</span>| + <span class="var">k</span></p>
+          <p class="formula"><span class="var">y</span> = <span class="var">a</span>√(<span class="var">x</span> − <span class="var">h</span>) + <span class="var">k</span></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container page-body">
+    <div class="widget">
+      <section class="widget__main" aria-label="Animation">
+        <div class="stage">
+          <canvas id="scene"></canvas>
+          {{stage_settings}}
+          <button id="run" class="stage__run" type="button">▶ Run animation</button>
+        </div>
+        <div class="narration" id="narration" aria-live="polite">Press run to animate.</div>
+        <div class="transport">
+          <button id="play" class="btn btn--primary btn--pill" type="button">▶ Play</button>
+          <button id="finish" class="btn btn--pill" type="button">Show final</button>
+          <input id="scrub" type="range" min="0" max="1000" value="1000" aria-label="Timeline position">
+          <label class="inline">Speed
+            <select id="speed" class="select">
+              <option value="0.5">0.5×</option>
+              <option value="1" selected>1×</option>
+              <option value="2">2×</option>
+            </select>
+          </label>
+        </div>
+
+        <section class="panel steps-panel" aria-labelledby="steps-title">
+          <div class="panel__head">
+            <h2 class="panel__title" id="steps-title">Step by step</h2>
+            {{code_button}}
+          </div>
+          <ol class="steps steps--compact" id="steps"></ol>
+        </section>
+      </section>
+
+      <aside class="widget__side">
+        <fieldset class="panel">
+          <legend>Function</legend>
+          <div class="kinds" role="radiogroup" aria-label="Parent function">
+            <label class="kind"><input type="radio" name="kind" value="linear"><span><b>F.1</b> Linear</span></label>
+            <label class="kind"><input type="radio" name="kind" value="absolute"><span><b>F.4</b> Absolute value</span></label>
+            <label class="kind"><input type="radio" name="kind" value="sqrt"><span><b>F.5</b> Square root</span></label>
+          </div>
+          <div class="params" data-for="linear">
+            <div class="field">
+              <label for="m-num"><span class="var">m</span></label>
+              <input id="m-range" type="range" min="-5" max="5" step="0.5" aria-label="m slider">
+              <input id="m-num" type="number" step="any">
+            </div>
+            <div class="field">
+              <label for="b-num"><span class="var">b</span></label>
+              <input id="b-range" type="range" min="-10" max="10" step="0.5" aria-label="b slider">
+              <input id="b-num" type="number" step="any">
+            </div>
+            <dl class="results terms param-terms">
+              <dt><span class="var">m</span>, the slope</dt><dd>how much y changes for each 1 across</dd>
+              <dt><span class="var">b</span>, the y-intercept</dt><dd>where the line crosses the y-axis</dd>
+            </dl>
+          </div>
+          <div class="params" data-for="absolute sqrt">
+            <div class="field">
+              <label for="a-num"><span class="var">a</span></label>
+              <input id="a-range" type="range" min="-4" max="4" step="0.5" aria-label="a slider">
+              <input id="a-num" type="number" step="any">
+            </div>
+            <div class="field">
+              <label for="h-num"><span class="var">h</span></label>
+              <input id="h-range" type="range" min="-8" max="8" step="0.5" aria-label="h slider">
+              <input id="h-num" type="number" step="any">
+            </div>
+            <div class="field">
+              <label for="k-num"><span class="var">k</span></label>
+              <input id="k-range" type="range" min="-8" max="8" step="0.5" aria-label="k slider">
+              <input id="k-num" type="number" step="any">
+            </div>
+            <dl class="results terms param-terms">
+              <dt><span class="var">a</span>, the stretch</dt><dd>bigger is steeper; negative flips the graph over</dd>
+              <dt><span class="var">h</span>, <span class="var">k</span>, the shift</dt><dd>move the vertex or starting point from (0, 0) to (h, k)</dd>
+            </dl>
+          </div>
+          <p id="error" class="error" role="alert" hidden></p>
+          <div class="chips" id="presets"></div>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend>Results</legend>
+          <dl class="results" id="results"></dl>
+          <details class="glossary">
+            <summary>What these terms mean</summary>
+            <dl class="terms" id="glossary"></dl>
+          </details>
+        </fieldset>
+      </aside>
+    </div>
+  </main>
+
+  <script id="pp-config" type="application/json">{{config}}</script>
+  <script>
+{{scripts}}
+  </script>
+</body>
+</html>

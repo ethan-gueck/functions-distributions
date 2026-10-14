@@ -4,7 +4,7 @@ The Functions & Distributions domain of [Ethan's NN](https://ethan-gueck.github.
 
 **The Python in [`core/formula.py`](core/formula.py) is handwritten by Ethan Gueck.** The topic folders around it (solvers, pages and tests) are scaffolding that calls it.
 
-Flashcard decks in this track: Probability Distributions. A neuron on the portfolio fills in once a topic here lists its card id in `cards`, and its **See how it works** button opens the topic's page.
+Flashcard decks in this track: Functions, Probability Distributions. A neuron on the portfolio fills in once a topic here lists its card id in `cards`, and its **See how it works** button opens the topic's page.
 
 ## Site health
 
@@ -14,7 +14,11 @@ The bar is the cumulative size of every file in the published site, where 100% i
 
 ## Topics
 
-None yet: every neuron in this track shows its flashcard with **Coming soon**.
+| Topic | Page | Flashcards |
+| --- | --- | --- |
+| [`parent_functions/`](parent_functions/) | [Linear, Absolute Value & Square Root](https://ethan-gueck.github.io/functions-distributions/parent_functions/parent_functions.html) | F.1, F.4, F.5 |
+
+Every other neuron in this track shows its flashcard with **Coming soon**.
 
 ## Layout
 
