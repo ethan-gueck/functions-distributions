@@ -1,5 +1,6 @@
 /*
- * parent_functions.js — page controller for the linear, absolute-value and square-root parent functions.
+ * parent_functions.js — page controller for five parent functions: linear, absolute value, square root,
+ * reciprocal and cube root.
  *
  * Reads the Python-built config, wires the function picker and the m, b (linear) or a, h, k
  * (absolute value, square root) sliders, and turns a solution into a Manim-style Timeline: the
@@ -16,7 +17,7 @@
   const config = JSON.parse(document.getElementById("pp-config").textContent);
   const C = Object.fromEntries(Object.entries(config.roles).map(([el, role]) => [el, config.theme.stage[role]]));
   const NUMS = ["m", "b", "a", "h", "k"];
-  const KINDS = ["linear", "absolute", "sqrt"];
+  const KINDS = ["linear", "absolute", "sqrt", "reciprocal", "cbrt"];
 
   const $ = (id) => document.getElementById(id);
   const el = {
@@ -25,11 +26,13 @@
   };
   const IDLE = "Press run to animate.";
 
-  const PARENT = { linear: "y = x", absolute: "y = |x|", sqrt: "y = √x" };
+  const PARENT = { linear: "y = x", absolute: "y = |x|", sqrt: "y = √x", reciprocal: "y = 1/x", cbrt: "y = ∛x" };
   const PRESETS = {
     linear: [["y = x", { m: 1, b: 0 }], ["y = 2x + 1", { m: 2, b: 1 }], ["y = −0.5x + 3", { m: -0.5, b: 3 }], ["y = 4", { m: 0, b: 4 }]],
     absolute: [["y = |x|", { a: 1, h: 0, k: 0 }], ["y = |x − 3| − 2", { a: 1, h: 3, k: -2 }], ["y = −2|x − 3| + 4", { a: -2, h: 3, k: 4 }], ["y = 0.5|x + 2|", { a: 0.5, h: -2, k: 0 }]],
     sqrt: [["y = √x", { a: 1, h: 0, k: 0 }], ["y = √(x + 4)", { a: 1, h: -4, k: 0 }], ["y = 2√(x − 1) − 4", { a: 2, h: 1, k: -4 }], ["y = −√x + 3", { a: -1, h: 0, k: 3 }]],
+    reciprocal: [["y = 1/x", { a: 1, h: 0, k: 0 }], ["y = 2/(x − 3) + 1", { a: 2, h: 3, k: 1 }], ["y = −1/x", { a: -1, h: 0, k: 0 }], ["y = 4/(x + 2) − 2", { a: 4, h: -2, k: -2 }]],
+    cbrt: [["y = ∛x", { a: 1, h: 0, k: 0 }], ["y = 2∛(x − 1) + 2", { a: 2, h: 1, k: 2 }], ["y = −∛x", { a: -1, h: 0, k: 0 }], ["y = ∛(x + 8) − 1", { a: 1, h: -8, k: -1 }]],
   };
   const TERMS = {
     "Function": "Which parent function, and its flashcard.",
@@ -37,6 +40,8 @@
     "y-intercept": "Where the graph crosses the y-axis: the value at x = 0. For y = mx + b it is b.",
     "Vertex": "The point of the V, (h, k), where an absolute-value graph turns. For y = |x| it is (0, 0).",
     "Starting point": "Where a square-root graph begins, (h, k). Left of it, x − h is negative and has no real square root.",
+    "Center": "The point (h, k) the graph is built around: for y = a/(x − h) + k, where its two asymptotes cross; for y = a∛(x − h) + k, the middle of the S.",
+    "Asymptotes": "Lines a graph approaches but never reaches. y = a/(x − h) + k has x = h (the fraction is undefined there) and y = k.",
     "x-intercepts": "Where the graph crosses the x-axis, y = 0.",
     "Domain": "Every x the function accepts.",
     "Range": "Every y the function can give back.",
@@ -67,7 +72,7 @@
 
   function renderResults(sol) {
     const kp = sol.key_point;
-    const keyName = kp.name === "y-intercept" ? "y-intercept" : kp.name === "vertex" ? "Vertex" : "Starting point";
+    const keyName = { "y-intercept": "y-intercept", vertex: "Vertex", "starting point": "Starting point" }[kp.name] || "Center";
     const items = [
       ["form", "Function", `${sol.card} ${sol.name}`],
       ["form", "Equation", `<span class="nowrap">${sol.equation}</span>`],
@@ -77,6 +82,7 @@
     if (kp.name !== "y-intercept") {
       items.push(["cross", "y-intercept", sol.y_intercept === null ? "none (x = 0 is outside the domain)" : `${swatch(C.y_intercept)}${point(0, sol.y_intercept)}`]);
     }
+    if (sol.inputs.kind === "reciprocal") items.push(["key", "Asymptotes", `x = ${fmt(kp.x)}, y = ${fmt(kp.y)}`]);
     items.push(["key", "Domain", sol.domain], ["shape", "Range", sol.range], ["shape", "Shape", sol.shape]);
     el.results.innerHTML = rows(items);
   }
@@ -99,14 +105,26 @@
   }
 
   /** The graph as a function the canvas can trace; NaN where it is undefined (the canvas skips those). */
-  function graph(sol) {
+  function graph(sol, side = 0) {
     const { kind, m, b, a, h, k } = sol.inputs;
-    return (x) => { const y = evaluate(kind, x, m, b, a, h, k); return y === null ? NaN : y; };
+    return (x) => {
+      if (side && Math.sign(x - h) !== side) return NaN;   // one branch of a reciprocal at a time
+      const y = evaluate(kind, x, m, b, a, h, k);
+      return y === null ? NaN : y;
+    };
+  }
+
+  /** Trace the graph; a reciprocal is two branches, so neither path jumps across its asymptote. */
+  function trace(sol, p, color, fn = graph, options) {
+    if (sol.inputs.kind !== "reciprocal") { scene.curve(fn(sol), p, color, options); return; }
+    scene.curve(fn(sol, -1), p, color, options);
+    scene.curve(fn(sol, 1), p, color, options);
   }
 
   function parentGraph(kind) {
     if (kind === "linear") return (x) => x;
     if (kind === "absolute") return (x) => Math.abs(x);
+    if (kind === "cbrt") return (x) => Math.cbrt(x);
     return (x) => (x < 0 ? NaN : Math.sqrt(x));
   }
 
@@ -127,7 +145,21 @@
     if (show.parent) {
       tl.add({
         id: "form", caption: `The parent function ${PARENT[kind]}`, duration: 1.0,
-        draw: (p) => scene.curve(parentGraph(kind), p, C.parent, { width: 2 }),
+        draw: (p) => {
+          if (kind !== "reciprocal") { scene.curve(parentGraph(kind), p, C.parent, { width: 2 }); return; }
+          scene.curve((x) => (x < 0 ? 1 / x : NaN), p, C.parent, { width: 2 });
+          scene.curve((x) => (x > 0 ? 1 / x : NaN), p, C.parent, { width: 2 });
+        },
+      });
+    }
+    if (kind === "reciprocal") {
+      const v = scene.view;
+      tl.add({
+        id: "key", caption: `Asymptotes x = ${fmt(kp.x)} and y = ${fmt(kp.y)}`, duration: 0.9,
+        draw: (p) => {
+          scene.line(kp.x, v.y_min - 50, kp.x, v.y_max + 50, p, C.key, { width: 1.5, dash: [6, 6] });
+          scene.line(v.x_min - 50, kp.y, v.x_max + 50, kp.y, p, C.key, { width: 1.5, dash: [6, 6] });
+        },
       });
     }
     tl.add({
@@ -140,7 +172,7 @@
     tl.add({ id: "key", duration: 0.6, parallel: true, rate: rate.linear, draw: (p) => scene.flash(kp.x, kp.y, p, C.key) });
     tl.add({
       id: "shape", caption: `${sol.equation}: ${sol.shape}`, duration: 1.8,
-      draw: (p) => scene.curve(graph(sol), p, C.curve),
+      draw: (p) => trace(sol, p, C.curve),
     });
     if (show.points) {
       const pts = sol.table.filter((r) => r.y !== null);

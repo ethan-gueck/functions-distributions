@@ -1,0 +1,27 @@
+/* sine_cosine.css: page-specific styles for the sine and cosine waves. */
+.formula { margin: 0; display: inline-flex; align-items: center; gap: 0.3em; font-family: var(--font-serif); font-size: var(--fs-md); }
+.formulas { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-1); }
+
+.steps-panel { margin-top: var(--space-4); }
+
+/* The function picker: three cards' worth of choices, one row. */
+.kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-1); margin-bottom: var(--space-3); }
+.kind { position: relative; }
+.kind input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.kind span {
+  display: block; height: 100%; padding: 0.45rem 0.4rem; text-align: center; border: 1px solid var(--rule); border-radius: var(--radius-md);
+  font-family: var(--font-sans); font-size: var(--fs-sm); line-height: 1.25; color: var(--text-soft); background: var(--surface);
+}
+.kind b { display: block; font-size: 0.8em; letter-spacing: 0.05em; color: var(--primary-soft); }
+.kind input:checked + span { border-color: var(--primary); color: var(--text); box-shadow: inset 0 0 0 1px var(--primary); }
+.kind input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
+.params[hidden] { display: none; }
+
+.terms { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.terms dt { color: var(--text); font-weight: 600; padding-top: var(--space-2); }
+.terms dd { margin: 0; font-family: var(--font-sans); font-size: var(--fs-sm); color: var(--text-soft); }
+.param-terms { margin: var(--space-2) 0; }
+.glossary { margin-top: var(--space-3); }
+.glossary summary { cursor: pointer; font-family: var(--font-sans); font-size: var(--fs-sm); color: var(--primary-soft); }
+.glossary .terms { display: grid; margin: 0; }
+.nowrap { white-space: nowrap; }

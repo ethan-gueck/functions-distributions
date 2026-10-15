@@ -1,6 +1,6 @@
 /*
- * parent_functions_math.js — browser mirror of parent_functions/solver.py, the F.1, F.4 and F.5
- * sections of core/formula.py, and general/plotting/viewport.py.
+ * parent_functions_math.js — browser mirror of parent_functions/solver.py, the F.1, F.4, F.5, F.6
+ * and F.19 sections of core/formula.py, and general/plotting/viewport.py.
  *
  * The page recalculates as the sliders move, so the math is ported here. Python stays the source
  * of truth: tests/test_js_parity.py runs this file and compares solve() with the Python output.
@@ -9,7 +9,7 @@
 (function (global) {
   "use strict";
 
-  // ---- core/formula.py: F.1 Linear, F.4 Absolute Value, F.5 Square Root -----
+  // ---- core/formula.py: F.1 Linear, F.4 Absolute Value, F.5 Square Root, F.6 Reciprocal, F.19 Cube Root
   const linear = (x, m, b) => m * x + b;
   const linearXIntercept = (m, b) => -b / m;
   const absoluteValue = (x, a = 1, h = 0, k = 0) => a * Math.abs(x - h) + k;
@@ -23,11 +23,17 @@
   const squareRoot = (x, a = 1, h = 0, k = 0) => a * Math.sqrt(x - h) + k;
   const squareRootDomain = (h = 0) => h;
   const squareRootXIntercept = (a, h, k) => (-k / a < 0 ? null : h + (k / a) ** 2);
+  const reciprocal = (x, a = 1, h = 0, k = 0) => a / (x - h) + k;
+  const reciprocalAsymptotes = (h = 0, k = 0) => [h, k];
+  const reciprocalXIntercept = (a, h, k) => (k === 0 ? null : h - a / k);
+  const cubeRoot = (x, a = 1, h = 0, k = 0) => a * Math.cbrt(x - h) + k;
+  const cubeRootCenter = (h = 0, k = 0) => [h, k];
+  const cubeRootXIntercept = (a, h, k) => h + (-k / a) ** 3;
 
   // ---- parent_functions/solver.py -------------------------------------------
-  const KINDS = ["linear", "absolute", "sqrt"];
-  const CARDS = { linear: "F.1", absolute: "F.4", sqrt: "F.5" };
-  const NAMES = { linear: "Linear", absolute: "Absolute value", sqrt: "Square root" };
+  const KINDS = ["linear", "absolute", "sqrt", "reciprocal", "cbrt"];
+  const CARDS = { linear: "F.1", absolute: "F.4", sqrt: "F.5", reciprocal: "F.6", cbrt: "F.19" };
+  const NAMES = { linear: "Linear", absolute: "Absolute value", sqrt: "Square root", reciprocal: "Reciprocal", cbrt: "Cube root" };
 
   const clean = (v) => { const r = Number(v.toFixed(10)); return r === 0 ? 0 : r; };
   const fmt = (v) => String(Number(clean(v).toPrecision(4))).replace(/-/g, "−");
@@ -37,13 +43,15 @@
   const point = (x, y) => `(${fmt(x)}, ${fmt(y)})`;
 
   function validate(kind, a) {
-    if (!KINDS.includes(kind)) throw new Error(`Unknown function: ${kind}. Pick linear, absolute or sqrt.`);
+    if (!KINDS.includes(kind)) throw new Error(`Unknown function: ${kind}. Pick linear, absolute, sqrt, reciprocal or cbrt.`);
     if (kind !== "linear" && clean(a) === 0) throw new Error("a cannot be 0: the graph would flatten into the line y = k.");
   }
 
   function evaluate(kind, x, m = 1, b = 0, a = 1, h = 0, k = 0) {
     if (kind === "linear") return clean(linear(x, m, b));
     if (kind === "absolute") return clean(absoluteValue(x, a, h, k));
+    if (kind === "reciprocal") return x === h ? null : clean(reciprocal(x, a, h, k));
+    if (kind === "cbrt") return clean(cubeRoot(x, a, h, k));
     if (x < squareRootDomain(h)) return null;
     return clean(squareRoot(x, a, h, k));
   }
@@ -53,12 +61,19 @@
       if (clean(m) === 0) return `y = ${fmt(b)}`;
       return `y = ${coef(m)}x` + (clean(b) ? signed(b) : "");
     }
-    const inner = kind === "absolute" ? `|${shift(h)}|` : (clean(h) ? `√(${shift(h)})` : "√x");
+    if (kind === "reciprocal") {
+      const frac = clean(h) === 0 ? `${fmt(a)}/x` : `${fmt(a)}/(${shift(h)})`;
+      return `y = ${frac}` + (clean(k) ? signed(k) : "");
+    }
+    const root = kind === "cbrt" ? "∛" : "√";
+    const inner = kind === "absolute" ? `|${shift(h)}|` : (clean(h) ? `${root}(${shift(h)})` : `${root}x`);
     return `y = ${coef(a)}${inner}` + (clean(k) ? signed(k) : "");
   }
 
   function keyPoint(kind, m = 1, b = 0, a = 1, h = 0, k = 0) {
     if (kind === "linear") return { x: 0, y: clean(b), name: "y-intercept" };
+    if (kind === "reciprocal") { const [rh, rk] = reciprocalAsymptotes(h, k); return { x: clean(rh), y: clean(rk), name: "center" }; }
+    if (kind === "cbrt") { const [ch, ck] = cubeRootCenter(h, k); return { x: clean(ch), y: clean(ck), name: "center" }; }
     const [vh, vk] = kind === "absolute" ? absoluteValueVertex(h, k) : [squareRootDomain(h), k];
     return { x: clean(vh), y: clean(vk), name: kind === "absolute" ? "vertex" : "starting point" };
   }
@@ -69,14 +84,21 @@
       return [clean(linearXIntercept(m, b))];
     }
     if (kind === "absolute") return absoluteValueXIntercepts(a, h, k).map(clean);
-    const x = squareRootXIntercept(a, h, k);
+    if (kind === "cbrt") return [clean(cubeRootXIntercept(a, h, k))];
+    const x = kind === "reciprocal" ? reciprocalXIntercept(a, h, k) : squareRootXIntercept(a, h, k);
     return x === null ? [] : [clean(x)];
   }
 
-  const domain = (kind, h = 0) => (kind === "sqrt" ? `x ≥ ${fmt(squareRootDomain(h))}` : "all real numbers");
+  function domain(kind, h = 0) {
+    if (kind === "sqrt") return `x ≥ ${fmt(squareRootDomain(h))}`;
+    if (kind === "reciprocal") return `x ≠ ${fmt(h)}`;
+    return "all real numbers";
+  }
 
   function valueRange(kind, m = 1, b = 0, a = 1, k = 0) {
     if (kind === "linear") return clean(m) === 0 ? `only y = ${fmt(b)}` : "all real numbers";
+    if (kind === "reciprocal") return `y ≠ ${fmt(k)}`;
+    if (kind === "cbrt") return "all real numbers";
     return a > 0 ? `y ≥ ${fmt(k)}` : `y ≤ ${fmt(k)}`;
   }
 
@@ -89,12 +111,19 @@
       const opens = a > 0 ? "opens up" : "opens down";
       return `${opens}; each arm has slope ±${fmt(Math.abs(a))}, turning at x = ${fmt(h)}`;
     }
+    if (kind === "reciprocal") {
+      const sides = a > 0 ? "upper right and lower left" : "upper left and lower right";
+      return `two branches, in the ${sides} corners made by the asymptotes; each ${a > 0 ? "falls" : "rises"} as x grows`;
+    }
+    if (kind === "cbrt") return `${a > 0 ? "rises" : "falls"} everywhere, an S on its side; vertical for an instant at x = ${fmt(h)}`;
     return `${a > 0 ? "rises" : "falls"} from x = ${fmt(h)}, ever more slowly`;
   }
 
   function tableXs(kind, h = 0) {
     if (kind === "linear") return [-2, -1, 0, 1, 2];
     if (kind === "absolute") return [-2, -1, 0, 1, 2].map((d) => clean(h + d));
+    if (kind === "reciprocal") return [-2, -1, -0.5, 0.5, 1, 2].map((d) => clean(h + d));
+    if (kind === "cbrt") return [-8, -1, 0, 1, 8].map((d) => clean(h + d));
     return [0, 1, 4, 9].map((d) => clean(h + d));
   }
 
@@ -121,6 +150,24 @@
         { id: "shape", title: "The arms", math: shape(kind, 1, a, h) },
         { id: "cross", title: "x-intercepts: |x − h| = −k / a", math: crossing },
         { id: "table", title: "Plot points", math: rows },
+      ];
+    }
+    if (kind === "reciprocal") {
+      return [
+        { id: "form", title: "y = a / (x − h) + k", math: `a = ${fmt(a)}, h = ${fmt(h)}, k = ${fmt(k)}:  ${eq}` },
+        { id: "key", title: "Asymptotes x = h and y = k", math: `x = ${fmt(h)} (where x − h = 0 and the fraction is undefined) and y = ${fmt(k)} (where a / (x − h) shrinks to 0)` },
+        { id: "shape", title: "The branches", math: shape(kind, 1, a, h) },
+        { id: "cross", title: "x-intercept: a / (x − h) = −k", math: xs.length ? crossing : "none: k = 0, so the x-axis is the asymptote" },
+        { id: "table", title: "Plot points (x − h = ±0.5, ±1, ±2)", math: rows },
+      ];
+    }
+    if (kind === "cbrt") {
+      return [
+        { id: "form", title: "y = a∛(x − h) + k", math: `a = ${fmt(a)}, h = ${fmt(h)}, k = ${fmt(k)}:  ${eq}` },
+        { id: "key", title: "Center (h, k)", math: `the S turns at ${point(h, k)}; for y = ∛x it is (0, 0). Every x is allowed: ∛(−8) = −2` },
+        { id: "shape", title: "Shape", math: shape(kind, 1, a, h) },
+        { id: "cross", title: "x-intercept: x = h + (−k / a)³", math: crossing },
+        { id: "table", title: "Plot points (x − h = −8, −1, 0, 1, 8: perfect cubes)", math: rows },
       ];
     }
     return [
@@ -166,7 +213,7 @@
   function plotWindow(kind, m, b, a, h, k, table, xs) {
     const pts = table.filter((r) => r.y !== null);
     const near = (xs || []).filter((x) => Math.abs(x) <= 50);
-    const f = (x) => (kind !== "sqrt" || x >= h ? evaluate(kind, x, m, b, a, h, k) : k);
+    const f = (x) => ((kind === "sqrt" && x < h) || (kind === "reciprocal" && Math.abs(x - h) < 0.5) ? k : evaluate(kind, x, m, b, a, h, k));
     return fitViewport([...pts.map((r) => r.x), ...near, 0], f, { alwaysIncludeY: [...pts.map((r) => r.y), 0], padding: 0.2 });
   }
 
@@ -197,6 +244,8 @@
     linear, linear_x_intercept: linearXIntercept,
     absolute_value: absoluteValue, absolute_value_vertex: absoluteValueVertex, absolute_value_x_intercepts: absoluteValueXIntercepts,
     square_root: squareRoot, square_root_domain: squareRootDomain, square_root_x_intercept: squareRootXIntercept,
+    reciprocal, reciprocal_asymptotes: reciprocalAsymptotes, reciprocal_x_intercept: reciprocalXIntercept,
+    cube_root: cubeRoot, cube_root_center: cubeRootCenter, cube_root_x_intercept: cubeRootXIntercept,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else global.ParentMath = api;

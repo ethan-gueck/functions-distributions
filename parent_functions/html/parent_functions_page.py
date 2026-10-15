@@ -1,4 +1,4 @@
-"""Interactive page: the linear, absolute-value and square-root parent functions, moved and stretched."""
+"""Interactive page: five parent functions (linear, absolute value, square root, reciprocal, cube root), moved and stretched."""
 
 from __future__ import annotations
 
@@ -19,15 +19,17 @@ FORMULA = HTML_DIR.parent.parent / "core" / "formula.py"  # the track's mathemat
 
 MATH_SCRIPTS = (STATIC / "parent_functions_math.js",)
 BUNDLE = WIDGET.extend(css=[STATIC / "parent_functions.css"], js=[*MATH_SCRIPTS, STATIC / "parent_functions.js"])
-# The "View the code" popup shows only the concept: the F.1, F.4 and F.5 sections of core/formula.py.
+# The "View the code" popup shows only the concept: the F.1, F.4, F.5, F.6 and F.19 sections of core/formula.py.
 MATH = (
     "linear", "linear_x_intercept",
     "absolute_value", "absolute_value_vertex", "absolute_value_x_intercepts",
     "square_root", "square_root_domain", "square_root_x_intercept",
+    "reciprocal", "reciprocal_asymptotes", "reciprocal_x_intercept",
+    "cube_root", "cube_root_center", "cube_root_x_intercept",
 )
 # The animation's toggles, in the gear menu in the corner of the stage.
 SHOW = (("grid", "Grid"), ("labels", "Labels"), ("parent", "Parent function"), ("points", "Table points"), ("intercepts", "Intercepts"))
-CODE = (CodeFile(FORMULA, "The three parent functions in Python: y = mx + b, y = a|x − h| + k and y = a√(x − h) + k.", only=MATH),)
+CODE = (CodeFile(FORMULA, "The parent functions in Python: y = mx + b, y = a|x − h| + k, y = a√(x − h) + k, y = a/(x − h) + k and y = a∛(x − h) + k.", only=MATH),)
 
 
 def build_parent_functions_html(
@@ -40,7 +42,7 @@ def build_parent_functions_html(
     output_path: str | Path | None = DEFAULT_OUTPUT,
     *,
     theme: str | Theme | None = None,
-    title: str = "Linear, Absolute Value & Square Root",
+    title: str = "Parent Functions",
 ) -> Path | str:
     """Build the page with these values preloaded; ``output_path=None`` returns the HTML."""
     config = {

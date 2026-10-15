@@ -1,8 +1,10 @@
-"""Three parent functions and their shifted, stretched forms, built on core/formula.py.
+"""Five parent functions and their shifted, stretched forms, built on core/formula.py.
 
 core/formula.py holds the mathematics as written: F.1 Linear (linear, linear_x_intercept),
-F.4 Absolute Value (absolute_value, absolute_value_vertex, absolute_value_x_intercepts) and
-F.5 Square Root (square_root, square_root_domain, square_root_x_intercept). This module calls
+F.4 Absolute Value (absolute_value, absolute_value_vertex, absolute_value_x_intercepts),
+F.5 Square Root (square_root, square_root_domain, square_root_x_intercept), F.6 Reciprocal
+(reciprocal, reciprocal_asymptotes, reciprocal_x_intercept) and F.19 Cube Root (cube_root,
+cube_root_center, cube_root_x_intercept). This module calls
 those and adds what the page needs around them: input checks, float tidying, the equation,
 domain, range and shape as text, a table of points and a plot window. The JavaScript mirror
 (html/static/parent_functions_math.js) is kept identical by tests/test_js_parity.py.
@@ -16,9 +18,9 @@ from general.plotting import Viewport, fit_viewport
 
 from core import formula
 
-KINDS = ("linear", "absolute", "sqrt")
-CARDS = {"linear": "F.1", "absolute": "F.4", "sqrt": "F.5"}
-NAMES = {"linear": "Linear", "absolute": "Absolute value", "sqrt": "Square root"}
+KINDS = ("linear", "absolute", "sqrt", "reciprocal", "cbrt")
+CARDS = {"linear": "F.1", "absolute": "F.4", "sqrt": "F.5", "reciprocal": "F.6", "cbrt": "F.19"}
+NAMES = {"linear": "Linear", "absolute": "Absolute value", "sqrt": "Square root", "reciprocal": "Reciprocal", "cbrt": "Cube root"}
 
 
 def _clean(value: float) -> float:
@@ -54,17 +56,21 @@ def _point(x: float, y: float) -> str:
 
 def _validate(kind: str, a: float) -> None:
     if kind not in KINDS:
-        raise ValueError(f"Unknown function: {kind}. Pick linear, absolute or sqrt.")
+        raise ValueError(f"Unknown function: {kind}. Pick linear, absolute, sqrt, reciprocal or cbrt.")
     if kind != "linear" and _clean(a) == 0:
         raise ValueError("a cannot be 0: the graph would flatten into the line y = k.")
 
 
 def evaluate(kind: str, x: float, m: float = 1, b: float = 0, a: float = 1, h: float = 0, k: float = 0) -> float | None:
-    """y at x for the chosen function, or None where it is undefined (√ of a negative)."""
+    """y at x for the chosen function, or None where it is undefined (√ of a negative, 1/0)."""
     if kind == "linear":
         return _clean(formula.linear(x, m, b))
     if kind == "absolute":
         return _clean(formula.absolute_value(x, a, h, k))
+    if kind == "reciprocal":
+        return None if x == h else _clean(formula.reciprocal(x, a, h, k))
+    if kind == "cbrt":
+        return _clean(formula.cube_root(x, a, h, k))
     if x < formula.square_root_domain(h):
         return None
     return _clean(formula.square_root(x, a, h, k))
@@ -76,7 +82,11 @@ def equation(kind: str, m: float = 1, b: float = 0, a: float = 1, h: float = 0, 
         if _clean(m) == 0:
             return f"y = {fmt(b)}"
         return f"y = {_coef(m)}x" + (_signed(b) if _clean(b) else "")
-    inner = f"|{_shift(h)}|" if kind == "absolute" else (f"√({_shift(h)})" if _clean(h) else "√x")
+    if kind == "reciprocal":
+        inner = f"{fmt(a)}/x" if _clean(h) == 0 else f"{fmt(a)}/({_shift(h)})"
+        return f"y = {inner}" + (_signed(k) if _clean(k) else "")
+    root = "∛" if kind == "cbrt" else "√"
+    inner = f"|{_shift(h)}|" if kind == "absolute" else (f"{root}({_shift(h)})" if _clean(h) else f"{root}x")
     return f"y = {_coef(a)}{inner}" + (_signed(k) if _clean(k) else "")
 
 
@@ -84,6 +94,12 @@ def key_point(kind: str, m: float = 1, b: float = 0, a: float = 1, h: float = 0,
     """The point that pins the graph: the y-intercept of a line, the vertex of the V, the start of √."""
     if kind == "linear":
         return {"x": 0.0, "y": _clean(b), "name": "y-intercept"}
+    if kind == "reciprocal":
+        vh, vk = formula.reciprocal_asymptotes(h, k)
+        return {"x": _clean(vh), "y": _clean(vk), "name": "center"}
+    if kind == "cbrt":
+        vh, vk = formula.cube_root_center(h, k)
+        return {"x": _clean(vh), "y": _clean(vk), "name": "center"}
     vh, vk = formula.absolute_value_vertex(h, k) if kind == "absolute" else (formula.square_root_domain(h), k)
     return {"x": _clean(vh), "y": _clean(vk), "name": "vertex" if kind == "absolute" else "starting point"}
 
@@ -96,19 +112,27 @@ def x_intercepts(kind: str, m: float = 1, b: float = 0, a: float = 1, h: float =
         return [_clean(formula.linear_x_intercept(m, b))]
     if kind == "absolute":
         return [_clean(x) for x in formula.absolute_value_x_intercepts(a, h, k)]
-    x = formula.square_root_x_intercept(a, h, k)
+    if kind == "cbrt":
+        return [_clean(formula.cube_root_x_intercept(a, h, k))]
+    x = formula.reciprocal_x_intercept(a, h, k) if kind == "reciprocal" else formula.square_root_x_intercept(a, h, k)
     return [] if x is None else [_clean(x)]
 
 
 def domain(kind: str, h: float = 0) -> str:
     if kind == "sqrt":
         return f"x ≥ {fmt(formula.square_root_domain(h))}"
+    if kind == "reciprocal":
+        return f"x ≠ {fmt(h)}"
     return "all real numbers"
 
 
 def value_range(kind: str, m: float = 1, b: float = 0, a: float = 1, k: float = 0) -> str:
     if kind == "linear":
         return f"only y = {fmt(b)}" if _clean(m) == 0 else "all real numbers"
+    if kind == "reciprocal":
+        return f"y ≠ {fmt(k)}"
+    if kind == "cbrt":
+        return "all real numbers"
     return f"y ≥ {fmt(k)}" if a > 0 else f"y ≤ {fmt(k)}"
 
 
@@ -121,6 +145,11 @@ def shape(kind: str, m: float = 1, a: float = 1, h: float = 0) -> str:
     if kind == "absolute":
         opens = "opens up" if a > 0 else "opens down"
         return f"{opens}; each arm has slope ±{fmt(abs(a))}, turning at x = {fmt(h)}"
+    if kind == "reciprocal":
+        sides = "upper right and lower left" if a > 0 else "upper left and lower right"
+        return f"two branches, in the {sides} corners made by the asymptotes; each {'falls' if a > 0 else 'rises'} as x grows"
+    if kind == "cbrt":
+        return f"{'rises' if a > 0 else 'falls'} everywhere, an S on its side; vertical for an instant at x = {fmt(h)}"
     return f"{'rises' if a > 0 else 'falls'} from x = {fmt(h)}, ever more slowly"
 
 
@@ -130,6 +159,10 @@ def table_xs(kind: str, h: float = 0) -> list[float]:
         return [-2.0, -1.0, 0.0, 1.0, 2.0]
     if kind == "absolute":
         return [_clean(h + d) for d in (-2, -1, 0, 1, 2)]
+    if kind == "reciprocal":
+        return [_clean(h + d) for d in (-2, -1, -0.5, 0.5, 1, 2)]
+    if kind == "cbrt":
+        return [_clean(h + d) for d in (-8, -1, 0, 1, 8)]
     return [_clean(h + d) for d in (0, 1, 4, 9)]
 
 
@@ -159,6 +192,22 @@ def steps(kind: str, m: float, b: float, a: float, h: float, k: float, table: li
             {"id": "cross", "title": "x-intercepts: |x − h| = −k / a", "math": crossing},
             {"id": "table", "title": "Plot points", "math": rows},
         ]
+    if kind == "reciprocal":
+        return [
+            {"id": "form", "title": "y = a / (x − h) + k", "math": f"a = {fmt(a)}, h = {fmt(h)}, k = {fmt(k)}:  {eq}"},
+            {"id": "key", "title": "Asymptotes x = h and y = k", "math": f"x = {fmt(h)} (where x − h = 0 and the fraction is undefined) and y = {fmt(k)} (where a / (x − h) shrinks to 0)"},
+            {"id": "shape", "title": "The branches", "math": shape(kind, a=a, h=h)},
+            {"id": "cross", "title": "x-intercept: a / (x − h) = −k", "math": crossing if xs else "none: k = 0, so the x-axis is the asymptote"},
+            {"id": "table", "title": "Plot points (x − h = ±0.5, ±1, ±2)", "math": rows},
+        ]
+    if kind == "cbrt":
+        return [
+            {"id": "form", "title": "y = a∛(x − h) + k", "math": f"a = {fmt(a)}, h = {fmt(h)}, k = {fmt(k)}:  {eq}"},
+            {"id": "key", "title": "Center (h, k)", "math": f"the S turns at {_point(h, k)}; for y = ∛x it is (0, 0). Every x is allowed: ∛(−8) = −2"},
+            {"id": "shape", "title": "Shape", "math": shape(kind, a=a, h=h)},
+            {"id": "cross", "title": "x-intercept: x = h + (−k / a)³", "math": crossing},
+            {"id": "table", "title": "Plot points (x − h = −8, −1, 0, 1, 8: perfect cubes)", "math": rows},
+        ]
     return [
         {"id": "form", "title": "y = a√(x − h) + k", "math": f"a = {fmt(a)}, h = {fmt(h)}, k = {fmt(k)}:  {eq}"},
         {"id": "key", "title": "Domain: x − h ≥ 0", "math": f"x ≥ {fmt(h)}; the graph starts at {_point(h, k)}"},
@@ -172,7 +221,10 @@ def plot_window(kind: str, m: float, b: float, a: float, h: float, k: float, tab
     """Frame the table's points, the key point and any x-intercepts."""
     pts = [r for r in table if r["y"] is not None]
     near = [x for x in (xs or []) if abs(x) <= 50]
-    f = lambda x: evaluate(kind, x, m, b, a, h, k) if kind != "sqrt" or x >= h else k  # noqa: E731
+    def f(x):
+        if kind == "sqrt" and x < h or kind == "reciprocal" and abs(x - h) < 0.5:
+            return k  # outside the domain, or too close to the asymptote to frame
+        return evaluate(kind, x, m, b, a, h, k)
     return fit_viewport([r["x"] for r in pts] + near + [0.0], f, always_include_y=[r["y"] for r in pts] + [0.0], padding=0.2)
 
 

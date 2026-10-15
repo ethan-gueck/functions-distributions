@@ -15,9 +15,9 @@ def test_page_inlines_its_scripts_and_has_the_code_popup():
     assert "window.ParentMath" in document and "window.Manim" in document
     assert 'class="masthead__back"' in document and "theme-toggle" in document
     dialog = document.split('<dialog class="code-modal"')[1].split("</dialog>")[0]
-    for name in ("linear", "linear-x-intercept", "absolute-value", "absolute-value-vertex", "square-root", "square-root-domain"):
+    for name in ("linear", "linear-x-intercept", "absolute-value", "absolute-value-vertex", "square-root", "square-root-domain", "reciprocal", "cube-root"):
         assert f'id="pp-code-0-{name}"' in dialog
-    assert "_clean" not in dialog and "F.2 Quadratic" not in dialog  # only the concept
+    assert "_clean" not in dialog and "F.2 Quadratic" not in dialog and 'id="pp-code-0-sine"' not in dialog  # only these concepts
 
 
 def test_config_carries_solution_and_roles():

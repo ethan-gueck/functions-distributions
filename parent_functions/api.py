@@ -17,9 +17,9 @@ def _build_page(output_path, theme=None):
 
 
 TOPIC = Topic(
-    title="Linear, Absolute Value & Square Root",
-    description="Three parent functions, y = mx + b, y = |x| and y = √x, shifted and stretched: key point, intercepts, domain, range and a table of points.",
-    cards=("F.1", "F.4", "F.5"),  # flashcards: Linear; Absolute Value; Square Root
+    title="Parent Functions",
+    description="Five parent functions, y = mx + b, y = |x|, y = √x, y = 1/x and y = ∛x, shifted and stretched: key point, intercepts, asymptotes, domain, range and a table of points.",
+    cards=("F.1", "F.4", "F.5", "F.6", "F.19"),  # flashcards: Linear; Absolute Value; Square Root; Reciprocal; Cube Root
     modules=(
         JSModule(
             name="parent_functions",
@@ -36,14 +36,20 @@ TOPIC = Topic(
                 "square_root": formula.square_root,
                 "square_root_domain": formula.square_root_domain,
                 "square_root_x_intercept": formula.square_root_x_intercept,
+                "reciprocal": formula.reciprocal,
+                "reciprocal_asymptotes": formula.reciprocal_asymptotes,
+                "reciprocal_x_intercept": formula.reciprocal_x_intercept,
+                "cube_root": formula.cube_root,
+                "cube_root_center": formula.cube_root_center,
+                "cube_root_x_intercept": formula.cube_root_x_intercept,
             },
         ),
     ),
     pages=(
         Page(
             name="parent_functions",
-            title="Linear, Absolute Value & Square Root",
-            description="Interactive, Manim-style walkthrough of three parent functions and how a, h, k (or m, b) move them.",
+            title="Parent Functions",
+            description="Interactive, Manim-style walkthrough of five parent functions and how a, h, k (or m, b) move them.",
             build=_build_page,
             params=("kind", "m", "b", "a", "h", "k"),
             example={"kind": "absolute", "m": 1, "b": 0, "a": -2, "h": 3, "k": 4},

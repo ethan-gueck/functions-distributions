@@ -16,7 +16,8 @@ The bar is the cumulative size of every file in the published site, where 100% i
 
 | Topic | Page | Flashcards |
 | --- | --- | --- |
-| [`parent_functions/`](parent_functions/) | [Linear, Absolute Value & Square Root](https://ethan-gueck.github.io/functions-distributions/parent_functions/parent_functions.html) | F.1, F.4, F.5 |
+| [`parent_functions/`](parent_functions/) | [Parent Functions](https://ethan-gueck.github.io/functions-distributions/parent_functions/parent_functions.html) | F.1, F.4, F.5, F.6, F.19 |
+| [`sine_cosine/`](sine_cosine/) | [Sine & Cosine](https://ethan-gueck.github.io/functions-distributions/sine_cosine/sine_cosine.html) | F.10, F.11 |
 
 Every other neuron in this track shows its flashcard with **Coming soon**.
 

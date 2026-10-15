@@ -55,6 +55,20 @@ def square_root_x_intercept(a, h, k):
 
 # _____________ F.6 Reciprocal _____________
 
+def reciprocal(x, a=1, h=0, k=0):
+    """y = a / (x − h) + k: the hyperbola y = 1/x, stretched by a and moved so its asymptotes are x = h and y = k."""
+    return a / (x - h) + k
+
+def reciprocal_asymptotes(h=0, k=0):
+    """x = h and y = k: the lines the graph approaches but never touches. For y = 1/x they are the axes, x = 0 and y = 0."""
+    return h, k
+
+def reciprocal_x_intercept(a, h, k):
+    """x = h − a / k: where the curve crosses the x-axis. With k = 0 the x-axis is the asymptote, so it never does."""
+    if k == 0:
+        return None
+    return h - a / k
+
 # _____________ F.7 Exponential Growth _____________
 
 # _____________ F.8 Exponential Decay _____________
@@ -63,7 +77,27 @@ def square_root_x_intercept(a, h, k):
 
 # _____________ F.10 Sine _____________
 
+def sine(x, a=1, b=1, h=0, k=0):
+    """y = a sin(b(x − h)) + k: the sine wave, with amplitude |a|, period 2π / |b|, moved right by h and up by k. sin 0 = 0."""
+    return a * math.sin(b * (x - h)) + k
+
+def amplitude(a):
+    """|a|: half the height of the wave, from its midline to a peak."""
+    return abs(a)
+
+def period(b):
+    """2π / |b|: how far x travels in one full cycle. For y = sin x and y = cos x it is 2π."""
+    return 2 * math.pi / abs(b)
+
+def midline(k):
+    """y = k: the line the wave oscillates around, halfway between its peaks and troughs."""
+    return k
+
 # _____________ F.11 Cosine _____________
+
+def cosine(x, a=1, b=1, h=0, k=0):
+    """y = a cos(b(x − h)) + k: the same wave as sine, a quarter period earlier, cos x = sin(x + π/2). cos 0 = 1."""
+    return a * math.cos(b * (x - h)) + k
 
 # _____________ F.12 Tangent _____________
 
@@ -80,6 +114,18 @@ def square_root_x_intercept(a, h, k):
 # _____________ F.18 Floor (Step) Function _____________
 
 # _____________ F.19 Cube Root _____________
+
+def cube_root(x, a=1, h=0, k=0):
+    """y = a∛(x − h) + k: unlike √, the cube root accepts every real number, so ∛(−8) = −2. For y = ∛x = x^(1/3)."""
+    return a * math.cbrt(x - h) + k
+
+def cube_root_center(h=0, k=0):
+    """(h, k): the middle of the S, where the curve is vertical for an instant. For y = ∛x it is (0, 0)."""
+    return h, k
+
+def cube_root_x_intercept(a, h, k):
+    """x = h + (−k / a)³: where the curve crosses the x-axis. An odd root always crosses, exactly once."""
+    return h + (-k / a) ** 3
 
 # _____________ F.20 Even vs. Odd Powers _____________
 
